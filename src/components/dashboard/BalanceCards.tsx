@@ -37,7 +37,7 @@ export function BalanceCards({ totalIncome, totalExpenses, balance, savingsRate 
       delay: 0.2,
     },
     {
-      title: 'Taxa de Poupança',
+      title: 'Poupança',
       value: savingsRate,
       icon: PiggyBank,
       variant: savingsRate >= 20 ? 'income' as const : 'default' as const,
@@ -48,28 +48,28 @@ export function BalanceCards({ totalIncome, totalExpenses, balance, savingsRate 
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card, index) => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {cards.map((card) => (
         <motion.div
           key={card.title}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: card.delay, duration: 0.4, ease: 'easeOut' }}
         >
-          <Card variant={card.variant} className="relative overflow-hidden group hover:scale-[1.02] transition-transform">
+          <Card variant={card.variant} className="relative overflow-hidden group hover:scale-[1.02] transition-transform p-3 sm:p-4 md:p-6">
             <div className="absolute inset-0 opacity-10">
-              <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-current blur-3xl" />
+              <div className="absolute -right-8 -top-8 w-24 sm:w-32 h-24 sm:h-32 rounded-full bg-current blur-3xl" />
             </div>
             
             <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-muted-foreground">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <span className="text-xs sm:text-sm font-medium text-muted-foreground truncate pr-2">
                   {card.title}
                 </span>
-                <card.icon className={`w-5 h-5 ${card.iconColor}`} />
+                <card.icon className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${card.iconColor}`} />
               </div>
               
-              <div className="text-2xl font-bold">
+              <div className="text-base sm:text-lg md:text-2xl font-bold truncate">
                 {card.isPercentage 
                   ? `${card.value.toFixed(1)}%`
                   : formatCurrency(card.value)

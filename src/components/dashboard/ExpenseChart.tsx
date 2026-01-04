@@ -36,12 +36,12 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
 
   if (data.length === 0) {
     return (
-      <Card variant="glass" className="h-full">
-        <CardHeader>
-          <CardTitle className="text-lg">Despesas por Categoria</CardTitle>
+      <Card variant="glass" className="h-full min-h-[300px]">
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg">Despesas por Categoria</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-[280px]">
-          <p className="text-muted-foreground text-center">
+        <CardContent className="flex items-center justify-center h-[200px] sm:h-[280px]">
+          <p className="text-muted-foreground text-center text-sm">
             Nenhuma despesa registrada ainda
           </p>
         </CardContent>
@@ -54,22 +54,23 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.2, duration: 0.4 }}
+      className="h-full"
     >
       <Card variant="glass" className="h-full">
-        <CardHeader>
-          <CardTitle className="text-lg">Despesas por Categoria</CardTitle>
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg">Despesas por Categoria</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col lg:flex-row items-center gap-6">
-            <div className="w-full lg:w-1/2 h-[200px]">
+          <div className="flex flex-col items-center gap-4 sm:gap-6">
+            <div className="w-full h-[160px] sm:h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
+                    innerRadius={40}
+                    outerRadius={65}
                     paddingAngle={2}
                     dataKey="amount"
                   >
@@ -82,12 +83,12 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="glass rounded-lg p-3 shadow-lg border border-border">
-                            <p className="font-semibold">{data.category}</p>
-                            <p className="text-sm text-muted-foreground">
+                          <div className="bg-card rounded-lg p-2 sm:p-3 shadow-lg border border-border">
+                            <p className="font-semibold text-sm">{data.category}</p>
+                            <p className="text-xs text-muted-foreground">
                               {formatCurrency(data.amount)}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs text-muted-foreground">
                               {data.percentage}%
                             </p>
                           </div>
@@ -100,33 +101,33 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
               </ResponsiveContainer>
             </div>
             
-            <div className="w-full lg:w-1/2 space-y-2">
+            <div className="w-full space-y-1 sm:space-y-2">
               {chartData.map((item, index) => (
                 <motion.div
                   key={item.category}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + index * 0.05 }}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50 transition-colors"
+                  className="flex items-center justify-between p-1.5 sm:p-2 rounded-lg hover:bg-secondary/50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                     <div
-                      className="w-3 h-3 rounded-full"
+                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
                       style={{ backgroundColor: item.fill }}
                     />
-                    <span className="text-sm font-medium">{item.category}</span>
+                    <span className="text-xs sm:text-sm font-medium truncate">{item.category}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold">{formatCurrency(item.amount)}</p>
-                    <p className="text-xs text-muted-foreground">{item.percentage}%</p>
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <p className="text-xs sm:text-sm font-semibold">{formatCurrency(item.amount)}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">{item.percentage}%</p>
                   </div>
                 </motion.div>
               ))}
               
               <div className="pt-2 border-t border-border">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-muted-foreground">Total</span>
-                  <span className="font-bold">{formatCurrency(total)}</span>
+                  <span className="text-xs sm:text-sm font-medium text-muted-foreground">Total</span>
+                  <span className="text-sm sm:text-base font-bold">{formatCurrency(total)}</span>
                 </div>
               </div>
             </div>
