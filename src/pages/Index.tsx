@@ -66,12 +66,12 @@ const Index = () => {
     });
   };
 
-  const handleMarkBillAsPaid = (bill: Bill) => {
+  const handleMarkBillAsPaid = (bill: Bill, callback: (transactionId: string) => void) => {
     // Create an expense transaction when bill is marked as paid
     const [year, month] = currentMonth.split('-').map(Number);
     const transactionDate = new Date(year, month - 1, bill.dueDay || 1);
     
-    finance.addTransaction({
+    const newTransaction = finance.addTransaction({
       type: 'expense',
       category: bill.category,
       amount: bill.amount,
@@ -80,9 +80,20 @@ const Index = () => {
       isRecurring: bill.isFixed,
     });
     
+    // Pass the transaction ID back to update the bill
+    callback(newTransaction.id);
+    
     toast({
       title: 'Conta marcada como paga!',
       description: `${bill.name} foi adicionada às despesas do mês.`,
+    });
+  };
+
+  const handleUnmarkBillAsPaid = (transactionId: string) => {
+    finance.deleteTransaction(transactionId);
+    toast({
+      title: 'Pagamento removido',
+      description: 'A transação foi removida das despesas.',
     });
   };
 
@@ -226,6 +237,7 @@ const Index = () => {
           onUpdateBill={finance.updateBill}
           onDeleteBill={finance.deleteBill}
           onMarkAsPaid={handleMarkBillAsPaid}
+          onUnmarkAsPaid={handleUnmarkBillAsPaid}
         />
 
         {/* Charts and Transactions Grid */}

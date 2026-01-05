@@ -42,9 +42,10 @@ export interface Bill {
   isFixed: boolean;
   isPaid: boolean;
   paidDate?: string;
-  paidMonth?: string; // For fixed bills, tracks which months have been paid
+  paidMonth?: string;
+  transactionId?: string; // Track the transaction created when paid
   createdAt: string;
-  cancelledAt?: string; // When a fixed bill is cancelled
+  cancelledAt?: string;
 }
 
 export interface MonthlySummary {
