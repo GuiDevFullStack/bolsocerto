@@ -1,17 +1,20 @@
 import { motion } from 'framer-motion';
 import { 
   ArrowUpRight, 
-  ArrowDownRight
+  ArrowDownRight,
+  Trash2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Transaction } from '@/types/finance';
 import { formatCurrency, formatDate } from '@/lib/exportToExcel';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
+  onDeleteTransaction?: (id: string) => void;
 }
 
-export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+export function RecentTransactions({ transactions, onDeleteTransaction }: RecentTransactionsProps) {
   const recentTransactions = transactions.slice(0, 8);
 
   if (recentTransactions.length === 0) {
@@ -77,13 +80,26 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                   </div>
                 </div>
                 
-                <div className="text-right flex-shrink-0 ml-2">
-                  <p className={`font-semibold text-xs sm:text-sm ${isIncome ? 'text-income' : 'text-expense'}`}>
-                    {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
-                    {formatDate(transaction.date)}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <div className="text-right flex-shrink-0">
+                    <p className={`font-semibold text-xs sm:text-sm ${isIncome ? 'text-income' : 'text-expense'}`}>
+                      {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
+                      {formatDate(transaction.date)}
+                    </p>
+                  </div>
+                  
+                  {onDeleteTransaction && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 sm:h-8 sm:w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-expense"
+                      onClick={() => onDeleteTransaction(transaction.id)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             );
