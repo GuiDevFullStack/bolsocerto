@@ -25,7 +25,8 @@ interface BillsSectionProps {
   onAddBill: (bill: Omit<Bill, 'id'>) => void;
   onUpdateBill: (id: string, updates: Partial<Bill>) => void;
   onDeleteBill: (id: string) => void;
-  onMarkAsPaid: (bill: Bill) => void;
+  onMarkAsPaid: (bill: Bill, callback: (transactionId: string) => void) => void;
+  onUnmarkAsPaid: (transactionId: string) => void;
 }
 
 export function BillsSection({
@@ -36,6 +37,7 @@ export function BillsSection({
   onUpdateBill,
   onDeleteBill,
   onMarkAsPaid,
+  onUnmarkAsPaid,
 }: BillsSectionProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [billToDelete, setBillToDelete] = useState<Bill | null>(null);
@@ -72,24 +74,30 @@ export function BillsSection({
     
     if (!isPaidNow) {
       // Mark as paid and create expense transaction
-      onMarkAsPaid(bill);
-      if (bill.isFixed) {
-        onUpdateBill(bill.id, { 
-          paidMonth: currentMonth,
-          paidDate: new Date().toISOString()
-        });
-      } else {
-        onUpdateBill(bill.id, { 
-          isPaid: true,
-          paidDate: new Date().toISOString()
-        });
-      }
+      onMarkAsPaid(bill, (transactionId: string) => {
+        if (bill.isFixed) {
+          onUpdateBill(bill.id, { 
+            paidMonth: currentMonth,
+            paidDate: new Date().toISOString(),
+            transactionId
+          });
+        } else {
+          onUpdateBill(bill.id, { 
+            isPaid: true,
+            paidDate: new Date().toISOString(),
+            transactionId
+          });
+        }
+      });
     } else {
-      // Unmark as paid
+      // Unmark as paid - remove the transaction
+      if (bill.transactionId) {
+        onUnmarkAsPaid(bill.transactionId);
+      }
       if (bill.isFixed) {
-        onUpdateBill(bill.id, { paidMonth: undefined, paidDate: undefined });
+        onUpdateBill(bill.id, { paidMonth: undefined, paidDate: undefined, transactionId: undefined });
       } else {
-        onUpdateBill(bill.id, { isPaid: false, paidDate: undefined });
+        onUpdateBill(bill.id, { isPaid: false, paidDate: undefined, transactionId: undefined });
       }
     }
   };
