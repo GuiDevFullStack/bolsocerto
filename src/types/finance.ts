@@ -38,8 +38,13 @@ export interface Bill {
   amount: number;
   dueDay: number;
   category: string;
+  description?: string;
+  isFixed: boolean;
   isPaid: boolean;
   paidDate?: string;
+  paidMonth?: string; // For fixed bills, tracks which months have been paid
+  createdAt: string;
+  cancelledAt?: string; // When a fixed bill is cancelled
 }
 
 export interface MonthlySummary {

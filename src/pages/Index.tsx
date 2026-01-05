@@ -13,10 +13,12 @@ import { Button } from '@/components/ui/button';
 import { BalanceCards } from '@/components/dashboard/BalanceCards';
 import { ExpenseChart } from '@/components/dashboard/ExpenseChart';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
+import { BillsSection } from '@/components/bills/BillsSection';
 import { AddTransactionModal } from '@/components/transactions/AddTransactionModal';
 import { ExportModal } from '@/components/transactions/ExportModal';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { useToast } from '@/hooks/use-toast';
+import { Bill } from '@/types/finance';
 
 const Index = () => {
   const { toast } = useToast();
@@ -53,6 +55,34 @@ const Index = () => {
     toast({
       title: transaction.type === 'income' ? 'Receita adicionada!' : 'Despesa adicionada!',
       description: `${transaction.category}: R$ ${transaction.amount.toFixed(2)}`,
+    });
+  };
+
+  const handleAddBill = (bill: Omit<Bill, 'id'>) => {
+    finance.addBill(bill);
+    toast({
+      title: 'Conta adicionada!',
+      description: `${bill.name}: R$ ${bill.amount.toFixed(2)}`,
+    });
+  };
+
+  const handleMarkBillAsPaid = (bill: Bill) => {
+    // Create an expense transaction when bill is marked as paid
+    const [year, month] = currentMonth.split('-').map(Number);
+    const transactionDate = new Date(year, month - 1, bill.dueDay || 1);
+    
+    finance.addTransaction({
+      type: 'expense',
+      category: bill.category,
+      amount: bill.amount,
+      date: transactionDate.toISOString().split('T')[0],
+      description: `${bill.name}${bill.description ? ' - ' + bill.description : ''}`,
+      isRecurring: bill.isFixed,
+    });
+    
+    toast({
+      title: 'Conta marcada como paga!',
+      description: `${bill.name} foi adicionada às despesas do mês.`,
     });
   };
 
@@ -185,6 +215,17 @@ const Index = () => {
           totalExpenses={monthlyStats.totalExpenses}
           balance={monthlyStats.balance}
           savingsRate={monthlyStats.savingsRate}
+        />
+
+        {/* Bills Section */}
+        <BillsSection
+          bills={finance.bills}
+          categories={finance.categories}
+          currentMonth={currentMonth}
+          onAddBill={handleAddBill}
+          onUpdateBill={finance.updateBill}
+          onDeleteBill={finance.deleteBill}
+          onMarkAsPaid={handleMarkBillAsPaid}
         />
 
         {/* Charts and Transactions Grid */}
