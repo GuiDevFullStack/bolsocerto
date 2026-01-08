@@ -63,7 +63,9 @@ export function formatCurrency(value: number, currency: string = 'BRL'): string 
 }
 
 export function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('pt-BR', {
+  // Parse the date and adjust for Brazil timezone (UTC-3)
+  const date = new Date(dateString + 'T12:00:00');
+  return date.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -71,7 +73,9 @@ export function formatDate(dateString: string): string {
 }
 
 export function formatShortDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('pt-BR', {
+  // Parse the date and adjust for Brazil timezone (UTC-3)
+  const date = new Date(dateString + 'T12:00:00');
+  return date.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
   });

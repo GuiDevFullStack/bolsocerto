@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowUpRight, ArrowDownRight, Calendar, Tag, FileText, Repeat } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownRight, Calendar, Tag, FileText, Repeat, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Transaction } from '@/types/finance';
@@ -90,14 +90,25 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
                   </div>
                 </div>
 
-                {/* Date */}
+                {/* Payment Date */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <Calendar className="w-5 h-5 text-muted-foreground" />
+                  <CreditCard className="w-5 h-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Data do Pagamento</p>
                     <p className="font-medium">{formatDate(transaction.date)}</p>
                   </div>
                 </div>
+
+                {/* Due Date (if available) */}
+                {transaction.dueDate && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Data de Vencimento</p>
+                      <p className="font-medium">{formatDate(transaction.dueDate)}</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Description */}
                 {transaction.description && (
