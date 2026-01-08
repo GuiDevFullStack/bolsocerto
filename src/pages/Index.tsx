@@ -244,12 +244,20 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ExpenseChart data={expenseBreakdown} />
           <RecentTransactions 
-            transactions={monthTransactions} 
+            transactions={monthTransactions}
+            categories={finance.categories}
             onDeleteTransaction={(id) => {
               finance.deleteTransaction(id);
               toast({
                 title: 'Transação excluída',
                 description: 'O valor foi removido do balanço.',
+              });
+            }}
+            onUpdateTransaction={(id, updates) => {
+              finance.updateTransaction(id, updates);
+              toast({
+                title: 'Transação atualizada',
+                description: 'As alterações foram salvas.',
               });
             }}
           />
