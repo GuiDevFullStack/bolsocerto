@@ -8,6 +8,7 @@ export interface Transaction {
   category: string;
   amount: number;
   date: string;
+  dueDate?: string; // Due date if originated from a bill
   description: string;
   isRecurring: boolean;
   frequency?: FrequencyType;
