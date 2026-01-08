@@ -36,7 +36,8 @@ export interface Bill {
   id: string;
   name: string;
   amount: number;
-  dueDay: number;
+  dueDay?: number; // Only for fixed costs (day of month 1-31)
+  dueDate?: string; // Full due date for non-fixed bills (YYYY-MM-DD)
   category: string;
   description?: string;
   isFixed: boolean;

@@ -1,0 +1,200 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Pencil, CalendarIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Transaction, Category } from '@/types/finance';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+
+interface EditTransactionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (id: string, updates: Partial<Transaction>) => void;
+  transaction: Transaction | null;
+  categories: Category[];
+}
+
+export function EditTransactionModal({ isOpen, onClose, onSave, transaction, categories }: EditTransactionModalProps) {
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
+  const [date, setDate] = useState<Date | undefined>();
+
+  useEffect(() => {
+    if (transaction) {
+      setAmount(transaction.amount.toString());
+      setCategory(transaction.category);
+      setDescription(transaction.description || '');
+      setDate(new Date(transaction.date));
+    }
+  }, [transaction]);
+
+  const filteredCategories = transaction 
+    ? categories.filter(c => c.type === transaction.type)
+    : [];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!transaction || !amount || !category || !date) return;
+
+    const updates: Partial<Transaction> = {
+      amount: parseFloat(amount),
+      category,
+      description: description.trim() || undefined,
+      date: date.toISOString().split('T')[0],
+    };
+
+    onSave(transaction.id, updates);
+    onClose();
+  };
+
+  if (!transaction) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            onClick={onClose}
+          />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-md glass rounded-2xl border border-border shadow-2xl max-h-[90vh] overflow-y-auto"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                  <Pencil className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold">Editar Transação</h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+              {/* Amount */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-trans-amount">Valor *</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    R$
+                  </span>
+                  <Input
+                    id="edit-trans-amount"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="pl-10"
+                    placeholder="0,00"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <Label>Categoria *</Label>
+                <Select value={category} onValueChange={setCategory} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Date */}
+              <div className="space-y-2">
+                <Label>Data *</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP", { locale: ptBR }) : "Selecione a data"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-trans-description">Descrição (Opcional)</Label>
+                <Textarea
+                  id="edit-trans-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Detalhes adicionais..."
+                  rows={2}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button type="submit" className="w-full" size="lg">
+                Salvar Alterações
+              </Button>
+            </form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Receipt, Check, X, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Receipt, Pencil, AlertCircle, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Bill, Category } from '@/types/finance';
 import { AddBillModal } from './AddBillModal';
+import { EditBillModal } from './EditBillModal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface BillsSectionProps {
   bills: Bill[];
@@ -41,6 +44,8 @@ export function BillsSection({
 }: BillsSectionProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [billToDelete, setBillToDelete] = useState<Bill | null>(null);
+  const [billToEdit, setBillToEdit] = useState<Bill | null>(null);
+  const [billToConfirmPaid, setBillToConfirmPaid] = useState<Bill | null>(null);
 
   // Get bills for current month (including active fixed bills)
   const monthBills = bills.filter(bill => {
@@ -69,26 +74,12 @@ export function BillsSection({
     return bill.isPaid;
   };
 
-  const handleTogglePaid = (bill: Bill) => {
+  const handleCheckboxChange = (bill: Bill) => {
     const isPaidNow = isBillPaidForMonth(bill);
     
     if (!isPaidNow) {
-      // Mark as paid and create expense transaction
-      onMarkAsPaid(bill, (transactionId: string) => {
-        if (bill.isFixed) {
-          onUpdateBill(bill.id, { 
-            paidMonth: currentMonth,
-            paidDate: new Date().toISOString(),
-            transactionId
-          });
-        } else {
-          onUpdateBill(bill.id, { 
-            isPaid: true,
-            paidDate: new Date().toISOString(),
-            transactionId
-          });
-        }
-      });
+      // Show confirmation dialog before marking as paid
+      setBillToConfirmPaid(bill);
     } else {
       // Unmark as paid - remove the transaction
       if (bill.transactionId) {
@@ -102,6 +93,31 @@ export function BillsSection({
     }
   };
 
+  const handleConfirmPaid = () => {
+    if (!billToConfirmPaid) return;
+    
+    const bill = billToConfirmPaid;
+    
+    // Mark as paid and create expense transaction
+    onMarkAsPaid(bill, (transactionId: string) => {
+      if (bill.isFixed) {
+        onUpdateBill(bill.id, { 
+          paidMonth: currentMonth,
+          paidDate: new Date().toISOString(),
+          transactionId
+        });
+      } else {
+        onUpdateBill(bill.id, { 
+          isPaid: true,
+          paidDate: new Date().toISOString(),
+          transactionId
+        });
+      }
+    });
+    
+    setBillToConfirmPaid(null);
+  };
+
   const handleDeleteBill = (bill: Bill) => {
     if (bill.isFixed) {
       // For fixed bills, mark as cancelled instead of deleting
@@ -112,11 +128,26 @@ export function BillsSection({
     setBillToDelete(null);
   };
 
+  const handleEditBill = (id: string, updates: Partial<Bill>) => {
+    onUpdateBill(id, updates);
+    setBillToEdit(null);
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
+  };
+
+  const formatDueDate = (bill: Bill) => {
+    if (bill.isFixed && bill.dueDay) {
+      return `Dia ${bill.dueDay}`;
+    }
+    if (bill.dueDate) {
+      return format(new Date(bill.dueDate), "dd/MM/yyyy", { locale: ptBR });
+    }
+    return null;
   };
 
   const totalPending = monthBills
@@ -170,6 +201,7 @@ export function BillsSection({
               <AnimatePresence mode="popLayout">
                 {monthBills.map((bill) => {
                   const isPaid = isBillPaidForMonth(bill);
+                  const dueDateLabel = formatDueDate(bill);
                   return (
                     <motion.div
                       key={bill.id + currentMonth}
@@ -185,7 +217,7 @@ export function BillsSection({
                     >
                       <Checkbox
                         checked={isPaid}
-                        onCheckedChange={() => handleTogglePaid(bill)}
+                        onCheckedChange={() => handleCheckboxChange(bill)}
                         className="data-[state=checked]:bg-income data-[state=checked]:border-income"
                       />
                       
@@ -200,17 +232,31 @@ export function BillsSection({
                             </Badge>
                           )}
                         </div>
-                        {bill.description && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {bill.description}
-                          </p>
-                        )}
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {bill.description && (
+                            <span className="truncate">{bill.description}</span>
+                          )}
+                          {dueDateLabel && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              Venc: {dueDateLabel}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
                         <span className={`font-semibold whitespace-nowrap ${isPaid ? 'text-income' : 'text-expense'}`}>
                           {formatCurrency(bill.amount)}
                         </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => setBillToEdit(bill)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -236,6 +282,45 @@ export function BillsSection({
         categories={categories}
       />
 
+      <EditBillModal
+        isOpen={!!billToEdit}
+        onClose={() => setBillToEdit(null)}
+        onSave={handleEditBill}
+        bill={billToEdit}
+        categories={categories}
+      />
+
+      {/* Confirm Payment Dialog */}
+      <AlertDialog open={!!billToConfirmPaid} onOpenChange={() => setBillToConfirmPaid(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-income" />
+              Confirmar Pagamento
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Deseja marcar a conta "{billToConfirmPaid?.name}" como paga?
+              <br />
+              <span className="font-medium">Valor: {billToConfirmPaid && formatCurrency(billToConfirmPaid.amount)}</span>
+              <br />
+              <span className="text-xs text-muted-foreground">
+                Isso irá adicionar uma despesa às transações do mês.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Não</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPaid}
+              className="bg-income hover:bg-income/90"
+            >
+              Sim, marcar como paga
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Bill Dialog */}
       <AlertDialog open={!!billToDelete} onOpenChange={() => setBillToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
