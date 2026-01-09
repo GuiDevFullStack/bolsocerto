@@ -187,7 +187,13 @@ export function AddTransactionModal({ isOpen, onClose, onAdd, categories }: AddT
                     <Calendar
                       mode="single"
                       selected={date}
-                      onSelect={(d) => d && setDate(d)}
+                      onSelect={(d) => {
+                        if (d) {
+                          // Set time to noon to avoid UTC timezone issues
+                          const adjusted = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+                          setDate(adjusted);
+                        }
+                      }}
                       initialFocus
                       className="pointer-events-auto"
                     />

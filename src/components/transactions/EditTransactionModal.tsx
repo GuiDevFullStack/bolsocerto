@@ -39,7 +39,9 @@ export function EditTransactionModal({ isOpen, onClose, onSave, transaction, cat
       setAmount(transaction.amount.toString());
       setCategory(transaction.category);
       setDescription(transaction.description || '');
-      setDate(new Date(transaction.date));
+      // Parse date with noon time to avoid timezone issues
+      const [year, month, day] = transaction.date.split('-').map(Number);
+      setDate(new Date(year, month - 1, day, 12, 0, 0));
     }
   }, [transaction]);
 
@@ -168,7 +170,12 @@ export function EditTransactionModal({ isOpen, onClose, onSave, transaction, cat
                     <Calendar
                       mode="single"
                       selected={date}
-                      onSelect={setDate}
+                      onSelect={(d) => {
+                        if (d) {
+                          const adjusted = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+                          setDate(adjusted);
+                        }
+                      }}
                       initialFocus
                       className="pointer-events-auto"
                     />

@@ -229,7 +229,12 @@ export function AddBillModal({ isOpen, onClose, onAdd, categories }: AddBillModa
                       <Calendar
                         mode="single"
                         selected={dueDate}
-                        onSelect={setDueDate}
+                        onSelect={(d) => {
+                          if (d) {
+                            const adjusted = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+                            setDueDate(adjusted);
+                          }
+                        }}
                         initialFocus
                         className="pointer-events-auto"
                       />
