@@ -112,7 +112,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3"
@@ -120,7 +120,10 @@ const Index = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
                 <Wallet className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold hidden sm:block">FinanceApp</span>
+              <div>
+                <span className="text-xl font-bold hidden sm:block">BolsoCerto</span>
+                <p className="text-xs text-muted-foreground hidden sm:block">Seu app de controle de finanças</p>
+              </div>
             </motion.div>
 
             {/* Month Navigator */}
