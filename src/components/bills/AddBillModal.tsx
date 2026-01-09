@@ -19,6 +19,7 @@ import { Bill, Category } from '@/types/finance';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { formatDateToISO } from '@/lib/exportToExcel';
 
 interface AddBillModalProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ export function AddBillModal({ isOpen, onClose, onAdd, categories }: AddBillModa
     if (isFixed) {
       bill.dueDay = dueDay ? parseInt(dueDay) : undefined;
     } else {
-      bill.dueDate = dueDate ? dueDate.toISOString().split('T')[0] : undefined;
+      bill.dueDate = dueDate ? formatDateToISO(dueDate) : undefined;
     }
 
     onAdd(bill);

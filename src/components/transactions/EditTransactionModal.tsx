@@ -18,6 +18,7 @@ import { Transaction, Category } from '@/types/finance';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { formatDateToISO } from '@/lib/exportToExcel';
 
 interface EditTransactionModalProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export function EditTransactionModal({ isOpen, onClose, onSave, transaction, cat
       amount: parseFloat(amount),
       category,
       description: description.trim() || undefined,
-      date: date.toISOString().split('T')[0],
+      date: formatDateToISO(date),
     };
 
     onSave(transaction.id, updates);
