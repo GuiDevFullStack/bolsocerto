@@ -37,7 +37,10 @@ export function AddTransactionModal({ isOpen, onClose, onAdd, categories }: AddT
   const [type, setType] = useState<TransactionType>('expense');
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0);
+  });
   const [description, setDescription] = useState('');
   const [isRecurring, setIsRecurring] = useState(false);
 
@@ -187,11 +190,15 @@ export function AddTransactionModal({ isOpen, onClose, onAdd, categories }: AddT
                     <Calendar
                       mode="single"
                       selected={date}
-                      onSelect={(d) => {
-                        if (d) {
-                          // Set time to noon to avoid UTC timezone issues
-                          const adjusted = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
-                          setDate(adjusted);
+                      onSelect={(selectedDay) => {
+                        if (selectedDay) {
+                          // Use the date components directly to avoid any timezone issues
+                          const year = selectedDay.getFullYear();
+                          const month = selectedDay.getMonth();
+                          const day = selectedDay.getDate();
+                          const newDate = new Date(year, month, day, 12, 0, 0);
+                          console.log('Selected:', selectedDay, 'Adjusted:', newDate, 'Day:', day);
+                          setDate(newDate);
                         }
                       }}
                       initialFocus
