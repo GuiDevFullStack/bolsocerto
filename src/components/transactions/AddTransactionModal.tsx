@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus } from 'lucide-react';
+import { X, Plus, Minus, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Category, TransactionType } from '@/types/finance';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -12,6 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { formatDateToISO } from '@/lib/exportToExcel';
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -31,7 +37,7 @@ export function AddTransactionModal({ isOpen, onClose, onAdd, categories }: AddT
   const [type, setType] = useState<TransactionType>('expense');
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState<Date>(new Date());
   const [description, setDescription] = useState('');
   const [isRecurring, setIsRecurring] = useState(false);
 
@@ -45,7 +51,7 @@ export function AddTransactionModal({ isOpen, onClose, onAdd, categories }: AddT
       type,
       category,
       amount: parseFloat(amount),
-      date,
+      date: formatDateToISO(date),
       description,
       isRecurring,
     });
@@ -163,15 +169,30 @@ export function AddTransactionModal({ isOpen, onClose, onAdd, categories }: AddT
 
               {/* Date */}
               <div className="space-y-2">
-                <Label htmlFor="date">Data</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={date}
-                  onChange={e => setDate(e.target.value)}
-                  className="h-10 sm:h-11"
-                  required
-                />
+                <Label>Data</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-10 sm:h-11 justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP", { locale: ptBR }) : "Selecione a data"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(d) => d && setDate(d)}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Description */}
