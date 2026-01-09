@@ -45,7 +45,13 @@ export function EditBillModal({ isOpen, onClose, onSave, bill, categories }: Edi
       setCategory(bill.category);
       setDescription(bill.description || '');
       setDueDay(bill.dueDay?.toString() || '');
-      setDueDate(bill.dueDate ? new Date(bill.dueDate) : undefined);
+      // Parse date with noon time to avoid timezone issues
+      if (bill.dueDate) {
+        const [year, month, day] = bill.dueDate.split('-').map(Number);
+        setDueDate(new Date(year, month - 1, day, 12, 0, 0));
+      } else {
+        setDueDate(undefined);
+      }
     }
   }, [bill]);
 
@@ -206,7 +212,12 @@ export function EditBillModal({ isOpen, onClose, onSave, bill, categories }: Edi
                       <Calendar
                         mode="single"
                         selected={dueDate}
-                        onSelect={setDueDate}
+                        onSelect={(d) => {
+                          if (d) {
+                            const adjusted = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+                            setDueDate(adjusted);
+                          }
+                        }}
                         initialFocus
                         className="pointer-events-auto"
                       />
