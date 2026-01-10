@@ -293,16 +293,20 @@ const Index = () => {
         )}
       </main>
 
-      {/* Floating Action Button (Mobile) */}
+      {/* Floating Action Button (Mobile) - Peek from edge */}
       <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5 }}
-        className="fixed bottom-6 right-6 md:hidden"
+        initial={{ x: 40 }}
+        animate={{ x: 40 }}
+        whileHover={{ x: 0 }}
+        whileTap={{ x: 0 }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 40 }}
+        dragElastic={0.1}
+        className="fixed bottom-6 right-0 md:hidden z-50"
       >
         <Button
           size="xl"
-          className="rounded-full w-14 h-14 shadow-glow"
+          className="rounded-l-full rounded-r-none w-16 h-14 shadow-glow pr-6"
           onClick={() => setIsAddModalOpen(true)}
         >
           <Plus className="w-6 h-6" />
