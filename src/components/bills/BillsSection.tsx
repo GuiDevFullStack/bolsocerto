@@ -210,62 +210,68 @@ export function BillsSection({
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: -100 }}
-                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                      className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-lg border transition-all ${
                         isPaid 
                           ? 'bg-income/10 border-income/30' 
                           : 'bg-card border-border/50 hover:border-border'
                       }`}
                     >
-                      <Checkbox
-                        checked={isPaid}
-                        onCheckedChange={() => handleCheckboxChange(bill)}
-                        className="data-[state=checked]:bg-income data-[state=checked]:border-income"
-                      />
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className={`font-medium truncate ${isPaid ? 'line-through text-muted-foreground' : ''}`}>
-                            {bill.name}
-                          </span>
-                          {bill.isFixed && (
-                            <Badge variant="secondary" className="text-xs">
-                              Fixo
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          {bill.description && (
-                            <span className="truncate">{bill.description}</span>
-                          )}
-                          {dueDateLabel && (
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              Venc: {dueDateLabel}
+                      {/* Top row: checkbox, name, badge */}
+                      <div className="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
+                        <Checkbox
+                          checked={isPaid}
+                          onCheckedChange={() => handleCheckboxChange(bill)}
+                          className="data-[state=checked]:bg-income data-[state=checked]:border-income flex-shrink-0"
+                        />
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`font-medium text-sm sm:text-base ${isPaid ? 'line-through text-muted-foreground' : ''}`}>
+                              {bill.name}
                             </span>
-                          )}
+                            {bill.isFixed && (
+                              <Badge variant="secondary" className="text-xs flex-shrink-0">
+                                Fixo
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                            {bill.description && (
+                              <span className="truncate max-w-[150px] sm:max-w-none">{bill.description}</span>
+                            )}
+                            {dueDateLabel && (
+                              <span className="flex items-center gap-1 flex-shrink-0">
+                                <Calendar className="w-3 h-3" />
+                                Venc: {dueDateLabel}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-1">
-                        <span className={`font-semibold whitespace-nowrap ${isPaid ? 'text-income' : 'text-expense'}`}>
+                      {/* Bottom row on mobile / Right side on desktop: value and actions */}
+                      <div className="flex items-center justify-between sm:justify-end gap-2 pl-9 sm:pl-0">
+                        <span className={`font-semibold text-sm sm:text-base whitespace-nowrap ${isPaid ? 'text-income' : 'text-expense'}`}>
                           {formatCurrency(bill.amount)}
                         </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-primary"
-                          onClick={() => setBillToEdit(bill)}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => setBillToDelete(bill)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-0.5">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-primary"
+                            onClick={() => setBillToEdit(bill)}
+                          >
+                            <Pencil className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => setBillToDelete(bill)}
+                          >
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </motion.div>
                   );
