@@ -18,6 +18,7 @@ import { AddTransactionModal } from '@/components/transactions/AddTransactionMod
 import { ExportModal } from '@/components/transactions/ExportModal';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { useToast } from '@/hooks/use-toast';
+import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
 import { Bill } from '@/types/finance';
 
 const Index = () => {
@@ -327,6 +328,9 @@ const Index = () => {
         transactions={finance.transactions}
         categories={finance.categories}
       />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal />
     </div>
   );
 };
