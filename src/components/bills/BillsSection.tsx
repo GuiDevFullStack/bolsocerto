@@ -145,7 +145,8 @@ export function BillsSection({
       return `Dia ${bill.dueDay}`;
     }
     if (bill.dueDate) {
-      return format(new Date(bill.dueDate), "dd/MM/yyyy", { locale: ptBR });
+      // Add T12:00:00 to prevent UTC timezone shift
+      return format(new Date(bill.dueDate + 'T12:00:00'), "dd/MM/yyyy", { locale: ptBR });
     }
     return null;
   };
