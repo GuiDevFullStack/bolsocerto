@@ -105,11 +105,11 @@ export function OnboardingModal() {
           <div className="space-y-3">
             <div className="flex items-center gap-3 p-3 rounded-lg bg-income/10 border border-income/20">
               <div className="w-3 h-3 rounded-full bg-income" />
-              <span className="text-sm font-medium">Receitas do mês</span>
+              <span className="text-sm font-medium">Entradas do mês</span>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-expense/10 border border-expense/20">
               <div className="w-3 h-3 rounded-full bg-expense" />
-              <span className="text-sm font-medium">Despesas do mês</span>
+              <span className="text-sm font-medium">Saídas do mês</span>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
               <div className="w-3 h-3 rounded-full bg-primary" />
