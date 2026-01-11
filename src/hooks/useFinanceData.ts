@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Transaction, 
   Category, 
@@ -28,17 +28,20 @@ const DEFAULT_DATA: FinancialData = {
 export function useFinanceData() {
   const [data, setData] = useState<FinancialData>(DEFAULT_DATA);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isInitializedRef = useRef(false);
+  const isMountedRef = useRef(true);
 
   // Load encrypted data on mount
   useEffect(() => {
+    isMountedRef.current = true;
+    
     const loadData = async () => {
       try {
         // First, migrate any unencrypted data
         await migrateToEncrypted(STORAGE_KEY);
         
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
+        if (stored && isMountedRef.current) {
           let parsedData: FinancialData;
           
           if (isEncrypted(stored)) {
@@ -50,24 +53,34 @@ export function useFinanceData() {
             parsedData = JSON.parse(stored);
           }
           
-          setData(parsedData);
+          if (isMountedRef.current) {
+            setData(parsedData);
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);
         // If there's an error, start fresh
-        setData(DEFAULT_DATA);
+        if (isMountedRef.current) {
+          setData(DEFAULT_DATA);
+        }
       } finally {
-        setIsLoading(false);
-        setIsInitialized(true);
+        if (isMountedRef.current) {
+          setIsLoading(false);
+          isInitializedRef.current = true;
+        }
       }
     };
 
     loadData();
+
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   // Save encrypted data when it changes
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitializedRef.current) return;
 
     const saveData = async () => {
       try {
@@ -80,7 +93,7 @@ export function useFinanceData() {
     };
 
     saveData();
-  }, [data, isInitialized]);
+  }, [data]);
 
   const addTransaction = useCallback((transaction: Omit<Transaction, 'id'>) => {
     const newTransaction: Transaction = {
