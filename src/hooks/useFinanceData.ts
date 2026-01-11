@@ -8,6 +8,7 @@ import {
   FinancialData,
   DEFAULT_CATEGORIES 
 } from '@/types/finance';
+import { encryptData, decryptData, isEncrypted, migrateToEncrypted } from '@/lib/encryption';
 
 const STORAGE_KEY = 'finance_app_data';
 
@@ -16,38 +17,70 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'dark',
 };
 
-const getInitialData = (): FinancialData => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error('Error loading data from localStorage:', error);
-  }
-  
-  return {
-    transactions: [],
-    categories: DEFAULT_CATEGORIES,
-    incomeSources: [],
-    bills: [],
-    preferences: DEFAULT_PREFERENCES,
-  };
+const DEFAULT_DATA: FinancialData = {
+  transactions: [],
+  categories: DEFAULT_CATEGORIES,
+  incomeSources: [],
+  bills: [],
+  preferences: DEFAULT_PREFERENCES,
 };
 
 export function useFinanceData() {
-  const [data, setData] = useState<FinancialData>(getInitialData);
+  const [data, setData] = useState<FinancialData>(DEFAULT_DATA);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  // Load encrypted data on mount
   useEffect(() => {
-    setIsLoading(false);
+    const loadData = async () => {
+      try {
+        // First, migrate any unencrypted data
+        await migrateToEncrypted(STORAGE_KEY);
+        
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          let parsedData: FinancialData;
+          
+          if (isEncrypted(stored)) {
+            // Decrypt the data
+            const decrypted = await decryptData(stored);
+            parsedData = JSON.parse(decrypted);
+          } else {
+            // Fallback for any edge cases
+            parsedData = JSON.parse(stored);
+          }
+          
+          setData(parsedData);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // If there's an error, start fresh
+        setData(DEFAULT_DATA);
+      } finally {
+        setIsLoading(false);
+        setIsInitialized(true);
+      }
+    };
+
+    loadData();
   }, []);
 
+  // Save encrypted data when it changes
   useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-  }, [data, isLoading]);
+    if (!isInitialized) return;
+
+    const saveData = async () => {
+      try {
+        const jsonData = JSON.stringify(data);
+        const encrypted = await encryptData(jsonData);
+        localStorage.setItem(STORAGE_KEY, encrypted);
+      } catch (error) {
+        console.error('Error saving data:', error);
+      }
+    };
+
+    saveData();
+  }, [data, isInitialized]);
 
   const addTransaction = useCallback((transaction: Omit<Transaction, 'id'>) => {
     const newTransaction: Transaction = {
