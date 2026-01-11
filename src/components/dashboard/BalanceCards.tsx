@@ -13,7 +13,7 @@ interface BalanceCardsProps {
 export function BalanceCards({ totalIncome, totalExpenses, balance, savingsRate }: BalanceCardsProps) {
   const cards = [
     {
-      title: 'Receitas',
+      title: 'Entradas',
       value: totalIncome,
       icon: TrendingUp,
       variant: 'income' as const,
@@ -21,7 +21,7 @@ export function BalanceCards({ totalIncome, totalExpenses, balance, savingsRate 
       delay: 0,
     },
     {
-      title: 'Despesas',
+      title: 'Saídas',
       value: totalExpenses,
       icon: TrendingDown,
       variant: 'expense' as const,
@@ -37,7 +37,7 @@ export function BalanceCards({ totalIncome, totalExpenses, balance, savingsRate 
       delay: 0.2,
     },
     {
-      title: 'Poupança',
+      title: '% Disponível',
       value: savingsRate,
       icon: PiggyBank,
       variant: savingsRate >= 20 ? 'income' as const : 'default' as const,

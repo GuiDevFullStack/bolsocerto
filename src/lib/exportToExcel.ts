@@ -9,7 +9,7 @@ export function exportToExcel(
   
   const rows = transactions.map(t => [
     new Date(t.date).toLocaleDateString('pt-BR'),
-    t.type === 'income' ? 'Receita' : 'Despesa',
+    t.type === 'income' ? 'Entrada' : 'Saída',
     t.category,
     t.amount.toFixed(2).replace('.', ','),
     t.description,
@@ -28,8 +28,8 @@ export function exportToExcel(
 
   rows.push([]);
   rows.push(['RESUMO', '', '', '', '', '', '']);
-  rows.push(['Total Receitas', '', '', totalIncome.toFixed(2).replace('.', ','), '', '', '']);
-  rows.push(['Total Despesas', '', '', totalExpenses.toFixed(2).replace('.', ','), '', '', '']);
+  rows.push(['Total Entradas', '', '', totalIncome.toFixed(2).replace('.', ','), '', '', '']);
+  rows.push(['Total Saídas', '', '', totalExpenses.toFixed(2).replace('.', ','), '', '', '']);
   rows.push(['Saldo', '', '', (totalIncome - totalExpenses).toFixed(2).replace('.', ','), '', '', '']);
 
   // Convert to CSV with BOM for Excel compatibility

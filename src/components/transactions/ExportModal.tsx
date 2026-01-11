@@ -142,14 +142,14 @@ export function ExportModal({ isOpen, onClose, transactions, categories }: Expor
                       checked={includeIncome}
                       onCheckedChange={(checked) => setIncludeIncome(checked as boolean)}
                     />
-                    <span className="text-sm">Receitas</span>
+                    <span className="text-sm">Entradas</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <Checkbox
                       checked={includeExpenses}
                       onCheckedChange={(checked) => setIncludeExpenses(checked as boolean)}
                     />
-                    <span className="text-sm">Despesas</span>
+                    <span className="text-sm">Saídas</span>
                   </label>
                 </div>
               </div>
@@ -172,7 +172,7 @@ export function ExportModal({ isOpen, onClose, transactions, categories }: Expor
 
                 {includeIncome && incomeCategories.length > 0 && (
                   <div className="space-y-2">
-                    <span className="text-xs text-income font-medium">Receitas</span>
+                    <span className="text-xs text-income font-medium">Entradas</span>
                     <div className="grid grid-cols-2 gap-2">
                       {incomeCategories.map(cat => (
                         <label
@@ -192,7 +192,7 @@ export function ExportModal({ isOpen, onClose, transactions, categories }: Expor
 
                 {includeExpenses && expenseCategories.length > 0 && (
                   <div className="space-y-2">
-                    <span className="text-xs text-expense font-medium">Despesas</span>
+                    <span className="text-xs text-expense font-medium">Saídas</span>
                     <div className="grid grid-cols-2 gap-2">
                       {expenseCategories.map(cat => (
                         <label

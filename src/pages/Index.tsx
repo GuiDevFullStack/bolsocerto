@@ -86,7 +86,7 @@ const Index = () => {
     
     toast({
       title: 'Conta marcada como paga!',
-      description: `${bill.name} foi adicionada às despesas do mês.`,
+      description: `${bill.name} foi adicionada às saídas do mês.`,
     });
   };
 
@@ -94,7 +94,7 @@ const Index = () => {
     finance.deleteTransaction(transactionId);
     toast({
       title: 'Pagamento removido',
-      description: 'A transação foi removida das despesas.',
+      description: 'A transação foi removida das saídas.',
     });
   };
 
@@ -278,7 +278,7 @@ const Index = () => {
             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow">
               <Wallet className="w-10 h-10 text-primary-foreground" />
             </div>
-            <h2 className="text-2xl font-bold mb-2">Bem-vindo ao FinanceApp!</h2>
+            <h2 className="text-2xl font-bold mb-2">Bem-vindo ao BolsoCerto!</h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Comece a controlar suas finanças adicionando sua primeira transação. 
               Todos os dados são armazenados localmente no seu dispositivo.

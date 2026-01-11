@@ -38,11 +38,11 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
     return (
       <Card variant="glass" className="h-full min-h-[300px]">
         <CardHeader className="pb-2 sm:pb-4">
-          <CardTitle className="text-base sm:text-lg">Despesas por Categoria</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Saídas por Categoria</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[200px] sm:h-[280px]">
           <p className="text-muted-foreground text-center text-sm">
-            Nenhuma despesa registrada ainda
+            Nenhuma saída registrada ainda
           </p>
         </CardContent>
       </Card>
@@ -58,7 +58,7 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
     >
       <Card variant="glass" className="h-full">
         <CardHeader className="pb-2 sm:pb-4">
-          <CardTitle className="text-base sm:text-lg">Despesas por Categoria</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Saídas por Categoria</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center gap-4 sm:gap-6">
